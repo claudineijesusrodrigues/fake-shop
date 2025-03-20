@@ -23,13 +23,26 @@ spec:
             value: ecommerce
           - name: POSTGRES_PASSWORD
             value: "Pg1234"
+
+---
+apiVersion: v1
+kind: Service
+metadata: 
+  name: postgre
+spec:
+  selector:
+    app: postgre
+  ports:
+    - port: 5432
+  type: ClusterIP
+
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata: 
   name: fakeshop
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: fakeshop
@@ -40,7 +53,7 @@ spec:
     spec:
       containers:
         - name: fakeshop
-          image: claudineijesusrodrigues/fake-shop:v3
+          image: claudineijesusrodrigues/fake-shop:v4
           ports:
           - containerPort: 5000
           env:
@@ -52,3 +65,19 @@ spec:
             value: Pg1234
           - name: DB_NAME
             value: ecommerce
+          - name: FLASK_APP
+            value: index.py
+
+---
+apiVersion: v1
+kind: Service
+metadata: 
+  name: fakeshop
+spec:
+  selector:
+    app: fakeshop
+  ports:
+    - port: 80
+      targetPort: 5000
+      nodePort: 30000
+  type: LoadBalancer
