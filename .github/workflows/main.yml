@@ -21,14 +21,28 @@ jobs:
           context: ./src
           push: true
           file: ./src/Dockerfile
-          tags: claudineijesusrodrigues/fake-shop:v${{ github.run_number }}
+          tags: |
+            claudineijesusrodrigues/fake-shop:v${{ github.run_number }}
+            claudineijesusrodrigues/fake-shop
       
       - run: echo "Enviar a imagem docker para docker hub"
   CD:
     needs: [CI]
     runs-on: ubuntu-latest
     steps:
-      - run: echo "obter codigo"
-      - run: echo "configurar kube config"
-      - run: echo "executar o apply deployment"
+      - name: Obtendo o codigo
+        uses: actions/checkout@v4.2.2
+
+      - uses: azure/k8s-set-context@v4
+        with:
+           method: kubeconfig
+           kubeconfig: ${{ secrets.K8S_KUBECONFIG }}
+           
+      - uses: Azure/k8s-deploy@v5
+        with:
+            manifests: |
+              k8s/deployment.yaml
+            images: |
+              claudineijesusrodrigues/fake-shop:v${{ github.run_number }}
+            
     
