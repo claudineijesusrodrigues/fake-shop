@@ -24,8 +24,6 @@ jobs:
           tags: |
             claudineijesusrodrigues/fake-shop:v${{ github.run_number }}
             claudineijesusrodrigues/fake-shop
-      
-      - run: echo "Enviar a imagem docker para docker hub"
   CD:
     needs: [CI]
     runs-on: ubuntu-latest
